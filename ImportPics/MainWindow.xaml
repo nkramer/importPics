@@ -10,10 +10,12 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="auto"/>
             <RowDefinition Height="auto"/>
+            <RowDefinition Height="auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <TextBox Text="description" x:Name="tb" Grid.Row="0"/>
-        <Button Content="Go" Click="Button_Click" Grid.Row="1"/>
-        <ListBox x:Name="lb"  Grid.Row="2"/>
+        <TextBox Text="description" x:Name="tb" Grid.Row="0"  Margin="10,10,10,0"/>
+        <CheckBox Content="What if" x:Name="whatIf" Grid.Row="1"  Margin="10,10,10,0"/>
+        <Button Content="Go" Click="Button_Click" Grid.Row="2" Width="100" HorizontalAlignment="Left" Margin="10,10,10,0" IsDefault="True" x:Name="button"/>
+        <ListBox x:Name="lb"  Grid.Row="3" Margin="10,20,10,10"/>
     </Grid>
 </Window>

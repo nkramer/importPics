@@ -43,13 +43,19 @@ namespace ImportPics
         {
             string text = tb.Text;
             var dispatcher = this.Dispatcher;
-            new Thread(() => BackgroundImport(text, dispatcher)).Start();
+            bool whatIf = this.whatIf.IsChecked.Value;
+            new Thread(() => BackgroundImport(text, dispatcher, whatIf)).Start();
+            button.IsEnabled = false;
         }
 
         private void AddTextToUi(string line)
         {
             list.Add(line);
             Debug.WriteLine(line);
+
+            var border = (Border)VisualTreeHelper.GetChild(lb, 0);
+            var scrollViewer = (ScrollViewer)VisualTreeHelper.GetChild(border, 0);
+            scrollViewer.ScrollToBottom();
         }
 
         private static void BackgroundAddTextToUi(string line, Dispatcher d)
@@ -58,7 +64,7 @@ namespace ImportPics
             d.Invoke(a);
         }
 
-        private static void BackgroundImport(string description, Dispatcher d)
+        private static void BackgroundImport(string description, Dispatcher d, bool whatIf)
         {
             description = description.Trim();
 
@@ -74,7 +80,8 @@ namespace ImportPics
                     string targetDir = Path.Combine(@"E:\Pictures", prefix);
                     if (!Directory.Exists(targetDir)) {
                         BackgroundAddTextToUi("Create " + targetDir, d);
-                        Directory.CreateDirectory(targetDir);
+                        if (!whatIf)
+                            Directory.CreateDirectory(targetDir);
                     }
 
                     string newName = Path.GetFileName(file);
@@ -84,10 +91,13 @@ namespace ImportPics
 
                     BackgroundAddTextToUi(file + " -> " + newPath, d);
                     Debug.WriteLine(file + " -> " + newPath);
-                    File.Copy(file, newPath);
-                    Thread.Sleep(1000);
+                    if (!whatIf)
+                        File.Copy(file, newPath);
+                    else
+                        Thread.Sleep(1000);
                 }
             }
+            BackgroundAddTextToUi("Done!", d);
         }
     }
 }
