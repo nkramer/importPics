@@ -44,7 +44,9 @@ namespace ImportPics
             string text = tb.Text;
             var dispatcher = this.Dispatcher;
             bool whatIf = this.whatIf.IsChecked.Value;
-            new Thread(() => BackgroundImport(text, dispatcher, whatIf)).Start();
+            DateTime importAfterDate = datepicker.SelectedDate.Value;
+
+            new Thread(() => BackgroundImport(text, dispatcher, whatIf, importAfterDate)).Start();
             button.IsEnabled = false;
         }
 
@@ -64,7 +66,7 @@ namespace ImportPics
             d.Invoke(a);
         }
 
-        private static void BackgroundImport(string description, Dispatcher d, bool whatIf)
+        private static void BackgroundImport(string description, Dispatcher d, bool whatIf, DateTime importAfterDate)
         {
             description = description.Trim();
 
@@ -75,26 +77,32 @@ namespace ImportPics
                 foreach (var file in files)
                 {
                     DateTime date = File.GetCreationTime(file);
-                    string dateStr = date.ToString("yyyy-MM-dd");
-                    string prefix = dateStr + " " + description;
-                    string targetDir = Path.Combine(@"E:\Pictures", prefix);
-                    if (!Directory.Exists(targetDir)) {
-                        BackgroundAddTextToUi("Create " + targetDir, d);
+                    if (date >= importAfterDate)
+                    {
+                        string dateStr = date.ToString("yyyy-MM-dd");
+                        string prefix = dateStr + " " + description;
+                        string targetDir = Path.Combine(@"E:\Pictures", prefix);
+                        if (!Directory.Exists(targetDir))
+                        {
+                            BackgroundAddTextToUi("Create " + targetDir, d);
+                            if (!whatIf)
+                                Directory.CreateDirectory(targetDir);
+                        }
+
+                        string newName = Path.GetFileName(file);
+                        newName = newName.Replace("DSC", prefix + " ");
+                        newName = newName.Replace("100_", prefix + " ");
+                        newName = newName.Replace("101_", prefix + " ");
+                        newName = newName.Replace("IMG_", prefix + " ");
+                        string newPath = Path.Combine(targetDir, newName);
+
+                        BackgroundAddTextToUi(file + " -> " + newPath, d);
+                        Debug.WriteLine(file + " -> " + newPath);
                         if (!whatIf)
-                            Directory.CreateDirectory(targetDir);
+                            File.Copy(file, newPath);
+                        //else
+                        //    Thread.Sleep(1000);
                     }
-
-                    string newName = Path.GetFileName(file);
-                    newName = newName.Replace("DSC", prefix + " ");
-                    newName = newName.Replace("101_", prefix + " ");
-                    string newPath = Path.Combine(targetDir, newName);
-
-                    BackgroundAddTextToUi(file + " -> " + newPath, d);
-                    Debug.WriteLine(file + " -> " + newPath);
-                    if (!whatIf)
-                        File.Copy(file, newPath);
-                    else
-                        Thread.Sleep(1000);
                 }
             }
             BackgroundAddTextToUi("Done!", d);
