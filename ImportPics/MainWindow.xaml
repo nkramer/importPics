@@ -17,8 +17,10 @@
         <TextBox Text="description" x:Name="tb" Grid.Row="0"  Margin="10,10,10,0"/>
         <CheckBox Content="What if" x:Name="whatIf" Grid.Row="1"  Margin="10,10,10,0" IsChecked="True"/>
         <StackPanel Orientation="Horizontal" Grid.Row="2"  >
-            <TextBlock Text="Import after" Margin="10"/>
+            <TextBlock Text="Import date range" Margin="10"/>
             <DatePicker x:Name="datepicker" SelectedDate="1/1/2019"/>
+            <TextBlock Text=" - " Margin="10"/>
+            <DatePicker x:Name="dateTo" SelectedDate="12/31/2099"/>
         </StackPanel> 
         <Button Content="Go" Click="Button_Click" Grid.Row="3" Width="100" HorizontalAlignment="Left" Margin="10,10,10,0" IsDefault="True" x:Name="button"/>
         <ListBox x:Name="lb"  Grid.Row="4" Margin="10,20,10,10"/>

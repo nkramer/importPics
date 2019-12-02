@@ -44,9 +44,10 @@ namespace ImportPics
             string text = tb.Text;
             var dispatcher = this.Dispatcher;
             bool whatIf = this.whatIf.IsChecked.Value;
-            DateTime importAfterDate = datepicker.SelectedDate.Value;
+            DateTime importEarliestDate = datepicker.SelectedDate.Value;
+            DateTime importLatestDate = dateTo.SelectedDate.Value;
 
-            new Thread(() => BackgroundImport(text, dispatcher, whatIf, importAfterDate)).Start();
+            new Thread(() => BackgroundImport(text, dispatcher, whatIf, importEarliestDate, importLatestDate)).Start();
             button.IsEnabled = false;
         }
 
@@ -66,7 +67,7 @@ namespace ImportPics
             d.Invoke(a);
         }
 
-        private static void BackgroundImport(string description, Dispatcher d, bool whatIf, DateTime importAfterDate)
+        private static void BackgroundImport(string description, Dispatcher d, bool whatIf, DateTime importAfterDate, DateTime importLatestDate)
         {
             description = description.Trim();
 
@@ -77,7 +78,7 @@ namespace ImportPics
                 foreach (var file in files)
                 {
                     DateTime date = File.GetCreationTime(file);
-                    if (date >= importAfterDate)
+                    if (date >= importAfterDate && date <= importLatestDate)
                     {
                         string dateStr = date.ToString("yyyy-MM-dd");
                         string prefix = dateStr + " " + description;
